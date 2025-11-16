@@ -32,6 +32,16 @@ jobs:
             java -jar plantuml.jar -tpng -o site/uml "$f"
           done
 
+      - name: Generate index.html
+        run: |
+          echo "<h1>UML Diagrams</h1>" > site/index.html
+          echo "<ul>" >> site/index.html
+          for f in site/uml/*.png; do
+            filename=$(basename "$f")
+            echo "<li><img src=\"uml/$filename\" style=\"max-width:600px;\"></li>" >> site/index.html
+          done
+          echo "</ul>" >> site/index.html
+
       - name: Publish
         uses: peaceiris/actions-gh-pages@v3
         with:
