@@ -56,13 +56,12 @@
 name: UML Validate & Render
 
 on:
-  pull_request:
-    paths:
-      - 'uml/**.puml'
   push:
-    branches: [ main ]
-    paths:
-      - 'uml/**.puml'
+    branches:
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   build-uml:
