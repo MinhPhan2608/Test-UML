@@ -68,6 +68,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          persist-credentials: true   # để bot có quyền push
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -84,7 +86,7 @@ jobs:
       - name: Validate & Render UML
         run: |
           mkdir -p uml-out
-          for f in $(git ls-files 'uml/*.puml'); do
+          for f in uml/*.puml; do
             echo "Processing $f"
             java -jar plantuml.jar -tpng -o uml-out "$f" || {
               echo "Syntax error in $f"
@@ -92,7 +94,7 @@ jobs:
             }
           done
 
-      - name: Commit generated diagrams
+      - name: Commit & Push generated diagrams
         run: |
           git config user.email "ci-bot@example.com"
           git config user.name "CI Bot"
@@ -100,5 +102,7 @@ jobs:
           git add uml-out/*.png
           if ! git diff --cached --quiet; then
             git commit -m "Auto-update UML diagrams"
-            git push
+            git push origin main
+          else
+            echo "No changes to commit"
           fi
