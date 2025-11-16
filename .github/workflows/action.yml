@@ -1,8 +1,12 @@
-name: Publish UML to GitHub Pages
+name: Deploy UML pages
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
@@ -10,26 +14,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Graphviz
-        run: sudo apt-get update && sudo apt-get install -y graphviz
+      - name: Build pages
+        run: echo "build steps here..."
 
-      - name: Render UML
+      - name: Push to gh-pages
         run: |
-          curl -L -o plantuml.jar https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar
-          mkdir -p site/uml
-          for f in $(git ls-files 'uml/*.puml'); do
-            java -jar plantuml.jar -tpng -o site/uml "$f"
-          done
-
-      - name: Publish
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Deploy" || echo "Nothing to commit"
+          git push origin gh-pages
