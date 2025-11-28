@@ -3,6 +3,10 @@
 ' =========================
 ' ENUM
 ' =========================
+enum Test {
+    TEST2
+    TEST2
+}
 
 enum OrderType {
     EAT_IN
