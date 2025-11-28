@@ -57,8 +57,9 @@ name: UML Validate & Render
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+    paths:
+      - 'uml/**.puml'
 
 permissions:
   contents: write
