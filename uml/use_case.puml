@@ -1,43 +1,276 @@
-@startuml
+@startuml Use case
 left to right direction
 
-actor Customer
-actor Driver
+actor Listener
+actor Label
+actor Admin
 
-rectangle "Food Ordering App" {
+rectangle "App" {
+    usecase "Đăng ký / Đăng nhập\nOTP / Logout" as UC_AUTH
+    usecase "Quản lý hồ sơ\n& mật khẩu" as UC_PROFILE
+    usecase "Sửa profile" as UC_EDIT_PROFILE
+    usecase "Đổi mật khẩu" as UC_CHANGE_PASSWORD
 
-    ' USE CASES
-    usecase "Đăng ký" as UC_Register
-    usecase "Đăng nhập" as UC_Login
+    usecase "Tìm kiếm nội dung" as UC_BROWSE
+    usecase "Phát nhạc" as UC_PLAY
+    usecase "Xem đề xuất\n& Trending" as UC_RECOMMEND
 
-    usecase "Đặt món" as UC_Order
-    usecase "Đặt món dùng tại chỗ" as UC_Order_EatIn
-    usecase "Đặt món giao tận nơi" as UC_Order_Delivery
+    usecase "Tạo playlist" as UC_CREATE_PLAYLIST
+    usecase "Thêm track\nvào playlist" as UC_ADD_TRACK
+    usecase "Sắp xếp / Bỏ track" as UC_SORT_TRACK
+    usecase "Yêu thích /\nBỏ yêu thích" as UC_FAVORITE
+    usecase "Follow /\nUnfollow" as UC_FOLLOW
+    usecase "Rating bài hát" as UC_RATE
 
-    usecase "Thanh toán" as UC_Pay
-    usecase "Xác thực thanh toán" as UC_Verify
-    usecase "Theo dõi đơn hàng" as UC_Track
-    usecase "Hủy đơn hàng" as UC_Cancel
+    usecase "Tạo giao dịch" as UC_CREATE_TX
+    usecase "Xem QR /\n Thanh toán" as UC_PAY
+    usecase "Xem lịch sử giao dịch" as UC_TX_HISTORY
+    usecase "Đăng ký / Huỷ /\nRenew gói" as UC_SUB
+    usecase "Xem phương thức\nthanh toán" as UC_PAYMENT_METHOD
+    usecase "Đăng ký" as UC_REGISTER
+    usecase "Đăng nhập" as UC_LOGIN
+    usecase "OTP xác thực" as UC_OTP
+    usecase "Logout" as UC_LOGOUT
 
-    ' ASSOCIATION
-    Customer -- UC_Register
-    Customer -- UC_Login
-    Customer -- UC_Order
-    Customer -- UC_Track
-    Driver -- UC_Track
+    UC_AUTH <.. UC_REGISTER : <<extend>>
+    UC_AUTH <.. UC_LOGIN : <<extend>>
+    UC_AUTH <.. UC_OTP : <<extend>>
+    UC_AUTH <.. UC_LOGOUT : <<extend>>
 
-    ' GENERALIZATION (USE CASE LEVEL)
-    UC_Order_EatIn -|> UC_Order
-    UC_Order_Delivery -|> UC_Order
+    '====================
+    ' Tách UC_VIEW
+    '====================
+    usecase "Xem chi tiết bài hát" as UC_VIEW_SONG
+    usecase "Xem chi tiết album" as UC_VIEW_ALBUM
+    usecase "Xem chi tiết playlist" as UC_VIEW_PLAYLIST
+    usecase "Xem chi tiết record label" as UC_VIEW_LABEL
 
-    ' INCLUDE
-    UC_Pay --> UC_Verify : <<include>>
+    Listener -- UC_VIEW_ALBUM
+    Listener -- UC_VIEW_PLAYLIST
 
-    ' EXTEND
-    UC_Cancel ..> UC_Track : <<extend>>
+    '====================
+    ' Tách UC_SUB
+    '====================
+    usecase "Đăng ký gói" as UC_SUBSCRIBE
+    usecase "Huỷ gói" as UC_CANCEL_SUB
+    usecase "Gia hạn gói" as UC_RENEW_SUB
 
-    ' ORDER FLOW
-    Customer -- UC_Pay
+    UC_SUB <.. UC_SUBSCRIBE : <<extend>>
+    UC_SUB <.. UC_CANCEL_SUB : <<extend>>
+    UC_SUB <.. UC_RENEW_SUB : <<extend>>
+
+    UC_SUBSCRIBE --> UC_CREATE_TX : <<include>>
+    UC_RENEW_SUB --> UC_CREATE_TX : <<include>>
+
+    usecase "Xem lịch sử nghe" as UC_VIEW_HISTORY
+    usecase "Xoá lịch sử nghe" as UC_DELETE_HISTORY
+
+
+    UC_VIEW_HISTORY <.. UC_DELETE_HISTORY : <<extend>>
+
+    Listener -- UC_AUTH
+    Listener -- UC_PROFILE
+    Listener -- UC_BROWSE
+    Listener -- UC_RECOMMEND
+    Listener -- UC_CREATE_PLAYLIST
+    Listener -- UC_VIEW_HISTORY
+    Listener -- UC_VIEW_LABEL
+
+    Listener -- UC_SUB
+    UC_CREATE_PLAYLIST --> UC_ADD_TRACK : <<include>>
+    UC_PAYMENT_METHOD --> UC_PAY : <<include>>
+    UC_CREATE_TX --> UC_PAYMENT_METHOD : <<include>>
+    Listener -- UC_TX_HISTORY
+
+    UC_VIEW_SONG <.. UC_FAVORITE : <<extend>>
+    UC_VIEW_SONG <.. UC_RATE : <<extend>>
+    UC_VIEW_SONG <.. UC_PLAY : <<extend>>
+    UC_VIEW_ALBUM <.. UC_SORT_TRACK : <<extend>>
+    UC_VIEW_PLAYLIST <.. UC_SORT_TRACK : <<extend>>
+    UC_VIEW_LABEL <.. UC_FOLLOW : <<extend>>
+    UC_VIEW_ALBUM <.. UC_VIEW_SONG: <<extend>>
+    UC_VIEW_PLAYLIST <.. UC_VIEW_SONG: <<extend>>
+
+    UC_RECOMMEND <.. UC_VIEW_SONG : <<extend>>
+    UC_VIEW_SONG <.. UC_ADD_TRACK : <<extend>>
+
+    UC_PROFILE <.. UC_EDIT_PROFILE : <<extend>>
+    UC_PROFILE <.. UC_CHANGE_PASSWORD : <<extend>>
+    usecase "Quản lý bài hát" as UC_MANAGE_SONG
+    usecase "Tạo bài hát" as UC_CREATE_SONG
+    usecase "Cập nhật bài hát" as UC_UPDATE_SONG
+    usecase "Xoá bài hát" as UC_DELETE_SONG
+    usecase "Cập nhật nghệ sĩ\ncho bài hát" as UC_UPDATE_ARTIST
+
+    '====================
+    ' Album management
+    '====================
+    usecase "Quản lý album" as UC_MANAGE_ALBUM
+    usecase "Tạo album" as UC_CREATE_ALBUM
+    usecase "Cập nhật album" as UC_UPDATE_ALBUM
+    usecase "Xoá album" as UC_DELETE_ALBUM
+
+    '====================
+    ' Asset ingest
+    '====================
+    usecase "Ingest asset" as UC_INGEST
+    usecase "Xin presign upload" as UC_PRESIGN
+    usecase "Phát lại thử" as UC_PREVIEW
+
+    '====================
+    ' Playlist & copyright
+    '====================
+    usecase "Quản lý playlist\nthuộc sở hữu" as UC_LABEL_PLAYLIST
+
+    usecase "Quản lý báo cáo bản quyền" as UC_MANAGE_COPYRIGHT
+    usecase "Gửi báo cáo bản quyền" as UC_SEND_COPYRIGHT
+    usecase "Theo dõi báo cáo bản quyền" as UC_TRACK_COPYRIGHT
+
+    '====================
+    ' Analytics & notify
+    '====================
+    usecase "Xem dashboard" as UC_DASHBOARD
+    usecase "Xem trending nội dung" as UC_TRENDING
+    usecase "Xem revenue" as UC_REVENUE
+
+    usecase "Thông báo & tìm kiếm\nnội dung của mình" as UC_LABEL_NOTIFY
+
+
+    '====================
+    ' Actor relations
+    '====================
+    Label -- UC_MANAGE_SONG
+    Label -- UC_MANAGE_ALBUM
+    Label -- UC_LABEL_PLAYLIST
+    Label -- UC_MANAGE_COPYRIGHT
+    Label -- UC_DASHBOARD
+    Label -- UC_LABEL_NOTIFY
+
+
+    '====================
+    ' Extend (CRUD logic)
+    '====================
+    UC_MANAGE_SONG <.. UC_CREATE_SONG : <<extend>>
+    UC_MANAGE_SONG <.. UC_UPDATE_SONG : <<extend>>
+    UC_MANAGE_SONG <.. UC_DELETE_SONG : <<extend>>
+    UC_MANAGE_SONG <.. UC_UPDATE_ARTIST : <<extend>>
+
+    UC_MANAGE_ALBUM <.. UC_CREATE_ALBUM : <<extend>>
+    UC_MANAGE_ALBUM <.. UC_UPDATE_ALBUM : <<extend>>
+    UC_MANAGE_ALBUM <.. UC_DELETE_ALBUM : <<extend>>
+
+
+    '====================
+    ' Include (technical flow)
+    '====================
+    UC_CREATE_SONG --> UC_INGEST : <<include>>
+    UC_UPDATE_SONG --> UC_INGEST : <<include>>
+
+    UC_INGEST --> UC_PRESIGN : <<include>>
+    UC_INGEST --> UC_PREVIEW : <<include>>
+
+
+    '====================
+    ' Extend (copyright)
+    '====================
+    UC_MANAGE_COPYRIGHT <.. UC_SEND_COPYRIGHT : <<extend>>
+    UC_MANAGE_COPYRIGHT <.. UC_TRACK_COPYRIGHT : <<extend>>
+
+
+    '====================
+    ' Extend (analytics)
+    '====================
+    UC_DASHBOARD <.. UC_TRENDING : <<extend>>
+    UC_DASHBOARD <.. UC_REVENUE : <<extend>>
+    usecase "Quản lý danh mục" as UC_ADMIN_CATALOG
+    usecase "Quản lý bài hát" as UC_ADMIN_SONG
+    usecase "Quản lý album" as UC_ADMIN_ALBUM
+    usecase "Quản lý thể loại" as UC_ADMIN_GENRE
+
+    usecase "Quản lý subscription" as UC_ADMIN_SUBSCRIPTION
+    usecase "Quản lý quảng cáo" as UC_ADMIN_ADVERTISEMENT
+
+    usecase "Xem thống kê doanh thu" as UC_REVENUE_ADMIN
+    usecase "Quản lý nhân sự" as UC_MANAGE_HR
+    usecase "Quản lý listener" as UC_MANAGE_LISTENER
+    usecase "Quản lý label" as UC_MANAGE_LABEL
+
+    usecase "Quản lý báo cáo bản quyền" as UC_ADMIN_REPORT
+    usecase "Duyệt báo cáo bản quyền" as UC_APPROVE_REPORT
+    usecase "Xoá báo cáo bản quyền" as UC_DELETE_REPORT
+
+    Admin -- UC_ADMIN_CATALOG
+    Admin -- UC_REVENUE_ADMIN
+    Admin -- UC_MANAGE_HR
+    '====================
+    ' Hide content
+    '====================
+    usecase "Ẩn nội dung" as UC_HIDE_CONTENT
+    usecase "Ẩn bài hát" as UC_HIDE_SONG
+    usecase "Ẩn album" as UC_HIDE_ALBUM
+
+    UC_HIDE_SONG ---|> UC_HIDE_CONTENT
+    UC_HIDE_ALBUM ---|> UC_HIDE_CONTENT
+
+    UC_ADMIN_SONG <.. UC_HIDE_CONTENT : <<extend>>
+    UC_ADMIN_ALBUM <.. UC_HIDE_CONTENT : <<extend>>
+
+    '====================
+    ' CRUD – Genre
+    '====================
+    usecase "Thêm thể loại" as UC_ADD_GENRE
+    usecase "Sửa thể loại" as UC_UPDATE_GENRE
+    usecase "Xoá thể loại" as UC_DELETE_GENRE
+
+    UC_ADMIN_GENRE <.. UC_ADD_GENRE : <<extend>>
+    UC_ADMIN_GENRE <.. UC_UPDATE_GENRE : <<extend>>
+    UC_ADMIN_GENRE <.. UC_DELETE_GENRE : <<extend>>
+
+    '====================
+    ' CRUD – Advertisement
+    '====================
+    usecase "Thêm quảng cáo" as UC_ADD_AD
+    usecase "Sửa quảng cáo" as UC_UPDATE_AD
+    usecase "Xoá quảng cáo" as UC_DELETE_AD
+
+    UC_ADMIN_ADVERTISEMENT <.. UC_ADD_AD : <<extend>>
+    UC_ADMIN_ADVERTISEMENT <.. UC_UPDATE_AD : <<extend>>
+    UC_ADMIN_ADVERTISEMENT <.. UC_DELETE_AD : <<extend>>
+
+    '====================
+    ' CRUD – Subscription
+    '====================
+    usecase "Thêm subscription" as UC_ADD_SUB
+    usecase "Sửa subscription" as UC_UPDATE_SUB
+    usecase "Xoá subscription" as UC_DELETE_SUB
+
+    UC_ADMIN_SUBSCRIPTION <.. UC_ADD_SUB : <<extend>>
+    UC_ADMIN_SUBSCRIPTION <.. UC_UPDATE_SUB : <<extend>>
+    UC_ADMIN_SUBSCRIPTION <.. UC_DELETE_SUB : <<extend>>
+    '====================
+    ' Ban account
+    '====================
+    usecase "Ban tài khoản" as UC_BAN_ACCOUNT
+
+    UC_MANAGE_LISTENER <.. UC_BAN_ACCOUNT : <<extend>>
+    UC_MANAGE_LABEL <.. UC_BAN_ACCOUNT : <<extend>>
+
+
+    '====================
+    ' Extend – catalog
+    '====================
+    UC_ADMIN_CATALOG <.. UC_ADMIN_SONG : <<extend>>
+    UC_ADMIN_CATALOG <.. UC_ADMIN_ALBUM : <<extend>>
+    UC_ADMIN_CATALOG <.. UC_ADMIN_GENRE : <<extend>>
+    UC_ADMIN_CATALOG <.. UC_ADMIN_SUBSCRIPTION : <<extend>>
+    UC_ADMIN_CATALOG <.. UC_ADMIN_ADVERTISEMENT : <<extend>>
+    UC_MANAGE_HR <.. UC_MANAGE_LISTENER : <<extend>>
+    UC_MANAGE_HR <.. UC_MANAGE_LABEL : <<extend>>
+    UC_MANAGE_HR <.. UC_ADMIN_REPORT : <<extend>>
+
+    '====================
+    ' Extend – copyright
+    '====================
+    UC_ADMIN_REPORT <.. UC_APPROVE_REPORT : <<extend>>
+    UC_ADMIN_REPORT <.. UC_DELETE_REPORT : <<extend>>
 }
-
-@enduml
